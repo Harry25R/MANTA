@@ -12,7 +12,7 @@ parser.add_argument('--seed', type=int, default=1,
 parser.add_argument('--k', type=int, default=10,
                     help='number of splits (default: 10)')
 parser.add_argument('--task', type=str,
-choices=['kidney-mtl'])
+                    choices=['kidney-mtl'])
 
 parser.add_argument('--hold_out_test', action='store_true', default=False,
                     help='hold-out the test set for each split')

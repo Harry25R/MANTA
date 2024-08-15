@@ -501,9 +501,16 @@ class Generic_MIL_Dataset(Generic_WSI_Classification_Dataset):
 						coords_list.append(   slide_coords_t   )
 					
 
-				features = troch.cat( features_list, dim = 0)
+				features = torch.cat( features_list, dim = 0)
 				coords   = torch.cat( coords_list,   dim = 0)
 				return features, label, coords
+			
+
+class Generic_WSI_Banff_Dataset(Generic_MIL_Dataset):
+	def __init__(self, data_dir, **kwargs):
+		super(Generic_WSI_Classification_Dataset, self).__init__(**kwargs)
+		self.data_dir = data_dir
+		self.use_h5 = False
 
 
 class Generic_Split(Generic_MIL_Dataset):

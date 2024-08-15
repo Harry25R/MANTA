@@ -5,14 +5,16 @@ from datasets.dataset_generic import Generic_WSI_Classification_Dataset, save_sp
 import argparse
 
 parser = argparse.ArgumentParser(description='Creating splits for whole slide classification')
+parser.add_argument('--csv_path', type=str, default='dataset_csv/KidneySplits_all_slides.csv',
+                    help='path to csv file containing slide information')
 parser.add_argument('--label_frac', type=float, default= -1,
                     help='fraction of labels (default: [0.25, 0.5, 0.75, 1.0])')
 parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
 parser.add_argument('--k', type=int, default=10,
                     help='number of splits (default: 10)')
-parser.add_argument('--task', type=str,
-                    choices=['kidney-mtl'])
+parser.add_argument('--task', type=str, default='kidney-mtl',
+                    choices=['kidney-mtl', 'kidney-banff'])
 
 parser.add_argument('--hold_out_test', action='store_true', default=False,
                     help='hold-out the test set for each split')
@@ -38,7 +40,7 @@ if args.task == 'kidney-mtl':
     p_test = 0.2   # use 20% data for test set
 
 elif args.task == 'kidney-banff':
-    dataset = Generic_WSI_Classification_Dataset(csv_path = 'dataset_csv/KidneySplits_all_slides.csv',
+    dataset = Generic_WSI_Classification_Dataset(csv_path = 'dataset_csv/KidneySplits_all_slides_banffcodes.csv',
                             shuffle = False,
                             seed = args.seed,
                             print_info = True,

@@ -91,21 +91,21 @@ class Generic_WSI_MTL_Dataset(Dataset):
 
 
 	def build_patient_dict(self):
-                patient_dict = {}
-                patient_cases = self.slide_data['case_id'].unique()
-                slide_cases   = self.slide_data.set_index('case_id')
+		patient_dict = {}
+		patient_cases = self.slide_data['case_id'].unique()
+		slide_cases   = self.slide_data.set_index('case_id')
 
-                for patient in patient_cases:
-                        slide_ids = slide_cases.loc[patient,'slide_id']
+		for patient in patient_cases:
+				slide_ids = slide_cases.loc[patient,'slide_id']
 
-                        if isinstance(slide_ids, str):
-                                slide_ids = np.array(slide_ids).reshape(-1)
-                        else:
-                                slide_ids = slide_ids.values
+				if isinstance(slide_ids, str):
+						slide_ids = np.array(slide_ids).reshape(-1)
+				else:
+						slide_ids = slide_ids.values
 
-                        patient_dict.update({patient:slide_ids})
+				patient_dict.update({patient:slide_ids})
 
-                return patient_dict
+		return patient_dict
 
 	def build_patient_dict_by_stain(self):
 		patient_dict = {}
@@ -568,6 +568,13 @@ class Generic_MIL_MTL_Dataset(Generic_WSI_MTL_Dataset):
 				features = torch.cat( features_list, dim = 0)
 				coords   = torch.cat( coords_list,   dim = 0)
 				return features, label_task1, label_task2, label_task3, coords
+			
+
+class Generic_MIL_MTL_Banff_Dataset(Generic_WSI_MTL_Dataset):
+	def _init_ (self, data_dir, **kwargs):
+		super(Generic_MIL_MTL_Banff_Dataset, self)._init_(**kwargs)
+		self.data_dir = data_dir
+		self.use_h5 = False
 
 
 class Generic_Split(Generic_MIL_MTL_Dataset):

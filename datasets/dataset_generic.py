@@ -425,9 +425,7 @@ class Generic_WSI_Classification_Dataset(Dataset):
 
 
 class Generic_MIL_Dataset(Generic_WSI_Classification_Dataset):
-	def __init__(self,
-		data_dir, 
-		**kwargs):
+	def __init__(self, data_dir, **kwargs):
 		super(Generic_MIL_Dataset, self).__init__(**kwargs)
 		self.data_dir = data_dir
 		self.use_h5 = False

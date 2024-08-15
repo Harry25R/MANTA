@@ -25,7 +25,7 @@ if args.task == 'kidney-mtl':
                             shuffle = False,
                             seed = args.seed,
                             print_info = True,
-                   	     label_dict = {'cell_no_amr_mild_ifta':0, 'cell_amr_moderate_ifta':1 ,'no_cell_no_amr_mild_ifta':2,
+                   	        label_dict = {'cell_no_amr_mild_ifta':0, 'cell_amr_moderate_ifta':1 ,'no_cell_no_amr_mild_ifta':2,
                    	     			'no_cell_amr_moderate_ifta':3, 'no_cell_amr_mild_ifta':4, 'cell_amr_mild_ifta':5,
                    	     			'cell_no_amr_moderate_ifta':6, 'no_cell_no_amr_moderate_ifta':7, 'no_cell_amr_advanced_ifta':8,
                    	     			'no_cell_no_amr_advanced_ifta':9, 'cell_amr_advanced_ifta':10, 'cell_no_amr_advanced_ifta':11},
@@ -36,6 +36,17 @@ if args.task == 'kidney-mtl':
 
     p_val  = 0.1   # use 10% of data in validation
     p_test = 0.2   # use 20% data for test set
+
+elif args.task == 'kidney-banff':
+    dataset = Generic_WSI_Classification_Dataset(csv_path = 'dataset_csv/KidneySplits_all_slides.csv',
+                            shuffle = False,
+                            seed = args.seed,
+                            print_info = True,
+                            label_dict = {'no_ifta':0, 'ifta':1},
+                            patient_strat= True,
+                            ignore=[])
+    p_val  = 0.1
+    p_test = 0.2
 
 else:
     raise NotImplementedError

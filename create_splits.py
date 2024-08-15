@@ -42,7 +42,7 @@ elif args.task == 'kidney-banff':
                             shuffle = False,
                             seed = args.seed,
                             print_info = True,
-                            label_dict = {'no_ifta':0, 'ifta':1},
+                            label_dict = {},
                             patient_strat= True,
                             ignore=[])
     p_val  = 0.1

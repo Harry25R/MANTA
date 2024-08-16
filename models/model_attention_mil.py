@@ -247,6 +247,7 @@ class MIL_Attention_fc_mtl_ms(nn.Module):
         self.size_dict = {"small": [768, 256, 256], "big": [768, 512, 384]}
         size = self.size_dict[size_arg]
         self.fusion = fusion
+        self.multihead_attn_pooling = MultiHeadAttentionPooling(embed_dim = 256, num_heads = 18, dropout = 0.25)
         
         if fusion == 'max':
             ms_fc_net = []
@@ -379,6 +380,32 @@ class MIL_Attention_fc_mtl_ms(nn.Module):
                 M_3 = torch.mm(F.softmax(torch.transpose(A_3, 1, 0), dim=1), M_3)
                 M_all = torch.cat([M_1, M_2, M_3], axis=0)
                 A_all['task'] = torch.stack([A_1, A_2, A_3], axis=0).detach().cpu().squeeze(dim=2).numpy()
+
+            elif self.fusion == 'mh_hierarchical_t':
+
+                M_all = torch.cat(M_all, axis=1)
+                h_task1 = M_all[0].reshape(4, 256).unsqueeze(axis=1)
+                h_task2 = M_all[1].reshape(4, 256).unsqueeze(axis=1)
+                h_task3 = M_all[2].reshape(4, 256).unsqueeze(axis=1)
+
+                h_task1 = self.task1_transformer(h_task1).squeeze(axis=1)
+                h_task2 = self.task2_transformer(h_task2).squeeze(axis=1)
+                h_task3 = self.task3_transformer(h_task3).squeeze(axis=1)
+
+                # combine each task
+                h_combined = torch.stack([h_task1, h_task2, h_task3], dim=0)
+                h_combined = h_combined.reshape(1, 0, 2)
+                pooled_output = self.multihead_attn_pooling(h_combined, h_combined, h_combined)
+
+                A_1, M_1 = self.task1_pooling(h_task1)
+                A_2, M_2 = self.task2_pooling(h_task2)
+                A_3, M_3 = self.task3_pooling(h_task3)
+                M_1 = torch.mm(F.softmax(torch.transpose(A_1, 1, 0), dim=1), M_1)
+                M_2 = torch.mm(F.softmax(torch.transpose(A_2, 1, 0), dim=1), M_2)
+                M_3 = torch.mm(F.softmax(torch.transpose(A_3, 1, 0), dim=1), M_3)
+                M_all = torch.cat([M_1, M_2, M_3], axis=0)
+                A_all['task'] = torch.stack([A_1, A_2, A_3], axis=0).detach().cpu().squeeze(dim=2).numpy()
+
             
         logits_task1  = self.classifier_1(M_all[0].unsqueeze(0))
         Y_hat_task1   = torch.topk(logits_task1, 1, dim = 1)[1]
@@ -457,3 +484,16 @@ class MIL_Attention_fc_mtl_ms(nn.Module):
             Y_hat_task3   = torch.topk(logits_task3, 1, dim = 1)[1]
             Y_prob_task3  = F.softmax(logits_task3, dim = 1)
             return Y_prob_task3
+
+
+class MultiHeadAttentionPooling(nn.Module):
+    def __init__(self, embed_dim = 1024, num_heads = 18, dropout = 0.25):
+        super(MultiHeadAttentionPooling, self).__init__()
+        self.attention = nn.MultiheadAttention(embed_dim, num_heads, dropout=dropout)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, query, value, key):
+        attn_output, _ = self.attention(query, value, key)
+        attn_output = self.dropout(attn_output)
+        return attn_output.mean(dim=0)
+

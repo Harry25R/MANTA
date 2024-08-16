@@ -485,7 +485,8 @@ class MIL_Attention_fc_mtl_ms(nn.Module):
             Y_prob_task3  = F.softmax(logits_task3, dim = 1)
             return Y_prob_task3
 
-
+# I want 18 heads. 
+# To do: Lasso penalty on the nHeads.
 class MultiHeadAttentionPooling(nn.Module):
     def __init__(self, embed_dim = 1024, num_heads = 18, dropout = 0.25):
         super(MultiHeadAttentionPooling, self).__init__()

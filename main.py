@@ -142,8 +142,7 @@ parser.add_argument('--patient_level', action='store_true', default=True, help='
 parser.add_argument('--stain_level', action='store_true', default=False)
 parser.add_argument('--fusion', type=str, default='tensor')
 parser.add_argument('--mtl', action='store_true', default=False, help='flag to enable multi-task problem')
-parser.add_argument('--task', type=str,
-choices=['kidney-mtl'])
+parser.add_argument('--task', type=str, choices=['kidney-mtl'])
 
 
 args = parser.parse_args()
@@ -196,7 +195,7 @@ print('\nLoad Dataset')
 if args.task == 'kidney-mtl':
     args.n_classes=[2,2,3] 
     dataset = Generic_MIL_MTL_Dataset(csv_path = 'dataset_csv/KidneySimpleLabels_edited_all_slides.csv',
-    				data_dir= os.path.join(args.data_root_dir, 'kidney-features'),
+    				        data_dir= os.path.join(args.data_root_dir, 'kidney-features'),
                             shuffle = False,
                             seed = args.seed,
                             print_info = True,
